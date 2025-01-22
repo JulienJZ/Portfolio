@@ -45,6 +45,21 @@
           spinner.style.display = "none"; // Cacher le spinner
         });
     }
+
+    // Bouton "Retour en haut"
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // Afficher/masquer le bouton "Retour en haut"
+    window.addEventListener("scroll", () => {
+      const scrollTopButton = document.getElementById("scroll-to-top");
+      if (window.scrollY > 300) {
+        scrollTopButton.style.display = "block";
+      } else {
+        scrollTopButton.style.display = "none";
+      }
+    });
   </script>
   <style>
     /* Styles de base */
