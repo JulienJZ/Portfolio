@@ -1,0 +1,224 @@
+<section id="product-page">
+    <div class="product-container">
+      <img src="https://via.placeholder.com/400x400" alt="Produit" class="product-image">
+      <div class="product-details">
+        <h2>Nom du Produit</h2>
+        <p>Description courte du produit, mettant en avant ses caractéristiques principales et ses avantages.</p>
+        <p class="price">Prix : <strong>29,99 €</strong></p>
+        <p class="stock">Stock disponible : <strong id="stock-count">12</strong> unités</p>
+        <p class="reviews">
+          Avis : 
+          <span class="stars">⭐⭐⭐⭐☆</span>
+          <span>(45 avis)</span>
+        </p>
+        <button class="add-to-cart">Ajouter au panier</button>
+        <p id="stock-error" style="color: #e63946; display: none;">Stock épuisé !</p>
+      </div>
+    </div>
+    <div class="cart-summary">
+      <h3>Votre Panier</h3>
+      <ul class="cart-items">
+        <!-- Les articles ajoutés apparaîtront ici -->
+      </ul>
+      <p class="total">Total : <strong>0,00 €</strong></p>
+    </div>
+  </section>
+  
+  <style>
+    /* Styles globaux */
+    :root {
+      --background-light: #f9f5f0;
+      --accent-color: #56c596; /* Vert menthe clair */
+      --accent-hover: #45a982;
+      --error-color: #e63946;
+      --text-color: #495057;
+    }
+  
+    #product-page {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: var(--background-light);
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+  
+    .product-container {
+      display: flex;
+      flex: 1;
+      gap: 1.5rem;
+    }
+  
+    .product-image {
+      max-width: 400px;
+      border-radius: 15px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+  
+    .product-image:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+  
+    .product-details {
+      max-width: 400px;
+    }
+  
+    .product-details h2 {
+      color: var(--accent-color);
+      font-size: 1.8rem;
+    }
+  
+    .product-details .price {
+      color: var(--accent-color);
+      font-size: 1.4rem;
+    }
+  
+    .product-details .stock {
+      color: #6c757d;
+      margin: 0.5rem 0;
+    }
+  
+    .product-details .reviews {
+      margin: 0.5rem 0;
+    }
+  
+    .product-details .stars {
+      color: #ffcc00;
+    }
+  
+    .product-details .add-to-cart {
+      margin-top: 1rem;
+      padding: 0.8rem 1.5rem;
+      background: var(--accent-color);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+  
+    .product-details .add-to-cart:hover {
+      background: var(--accent-hover);
+      transform: scale(1.05);
+    }
+  
+    #stock-error {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+    }
+  
+    .cart-summary {
+      flex: 1;
+      padding: 1rem;
+      border-radius: 15px;
+      background: var(--background-light);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+  
+    .cart-summary ul {
+      list-style-type: none;
+      padding: 0;
+    }
+  
+    .cart-summary ul li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #ddd;
+    }
+  
+    .cart-summary ul li button {
+      padding: 0.3rem 0.8rem;
+      background: var(--error-color);
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: background 0.3s ease;
+    }
+  
+    .cart-summary ul li button:hover {
+      background: #d62839;
+    }
+  
+    .total {
+      margin-top: 1rem;
+      font-size: 1.2rem;
+      color: var(--accent-color);
+    }
+  </style>
+  
+  <script>
+    const cartItems = [];
+    const cartList = document.querySelector('.cart-items');
+    const totalPriceElement = document.querySelector('.total strong');
+    const stockCountElement = document.getElementById('stock-count');
+    const stockErrorElement = document.getElementById('stock-error');
+  
+    // Ajouter un produit au panier
+    document.querySelector('.add-to-cart').addEventListener('click', () => {
+      const productName = document.querySelector('.product-details h2').innerText;
+      const productPrice = parseFloat(document.querySelector('.price strong').innerText.replace('€', '').trim());
+      let stockCount = parseInt(stockCountElement.innerText);
+  
+      if (stockCount > 0) {
+        // Ajouter l'article au tableau du panier
+        const cartItem = { id: Date.now(), name: productName, price: productPrice };
+        cartItems.push(cartItem);
+  
+        // Mettre à jour l'affichage
+        const listItem = document.createElement('li');
+        listItem.dataset.id = cartItem.id;
+        listItem.innerHTML = `
+          ${productName} - ${productPrice.toFixed(2)} €
+          <button class="remove-item">Supprimer</button>
+        `;
+        cartList.appendChild(listItem);
+  
+        // Décrémenter le stock
+        stockCount -= 1;
+        stockCountElement.innerText = stockCount;
+  
+        // Réinitialiser l'erreur de stock
+        stockErrorElement.style.display = 'none';
+  
+        // Recalculer le total
+        updateTotal();
+      } else {
+        stockErrorElement.style.display = 'block';
+      }
+    });
+  
+    // Supprimer un produit du panier
+    cartList.addEventListener('click', (event) => {
+      if (event.target.classList.contains('remove-item')) {
+        const itemId = parseInt(event.target.closest('li').dataset.id);
+        const itemIndex = cartItems.findIndex((item) => item.id === itemId);
+  
+        // Remettre le stock
+        stockCountElement.innerText = parseInt(stockCountElement.innerText) + 1;
+  
+        // Supprimer l'article du tableau
+        cartItems.splice(itemIndex, 1);
+  
+        // Supprimer l'affichage dans le panier
+        event.target.closest('li').remove();
+  
+        // Recalculer le total
+        updateTotal();
+      }
+    });
+  
+    // Mettre à jour le total du panier
+    function updateTotal() {
+      const total = cartItems.reduce((sum, item) => sum + item.price, 0);
+      totalPriceElement.innerText = `${total.toFixed(2)} €`;
+    }
+  </script>
+  
